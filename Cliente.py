@@ -1,31 +1,43 @@
 import socket
 import sys
 
+class Cliente:
+    def __init__(self, mensaje):
+        self._mensaje = mensaje
+       
+        # Crear socket
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    def iniciar_conexion(self):
+        # Conectar socket con el servidor para que empiece a escuchar 
+        server_address = ('localhost', 10000)
+        print('connecting to {} port {}'.format(*server_address))
+        self.sock.connect(server_address)
 
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Enviar datos
+        print('sending {!r}'.format(self._mensaje))
+        self.sock.sendall(self._mensaje)
 
-# Connect the socket to the port where the server is listening
-server_address = ('localhost', 10000)
-print('connecting to {} port {}'.format(*server_address))
-sock.connect(server_address)
+        # Esperar respuesta
+        amount_received = 0
+        amount_expected = len(self._mensaje)
+        
+        
 
-try:
+        while amount_received < amount_expected:
+            data = self.sock.recv(16)
+            amount_received += len(data)
+            print('received {!r}'.format(data))
+    
+    def terminar_conexion(self):
+        # Cerrar conexion
+        print('Conexion terminada')
+        self.sock.close()
 
-    # Send data
-    message = b'This is the message.  It will be repeated.'
-    print('sending {!r}'.format(message))
-    sock.sendall(message)
 
-    # Look for the response
-    amount_received = 0
-    amount_expected = len(message)
+mensaje = b'Hola mundo'
 
-    while amount_received < amount_expected:
-        data = sock.recv(16)
-        amount_received += len(data)
-        print('received {!r}'.format(data))
-
-finally:
-    print('closing socket')
-    sock.close()
+if __name__ == "__main__":
+    c = Cliente(mensaje)
+    c.iniciar_conexion()
+    c.terminar_conexion()
