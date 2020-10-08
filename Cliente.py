@@ -7,8 +7,6 @@ class Cliente(object):
         self.data = data
         self.hostname = hostname
         self.port = port 
-        
-        # Crear socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     def star(self):
