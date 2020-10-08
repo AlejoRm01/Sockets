@@ -2,6 +2,7 @@ import multiprocessing
 import socket
 
 def handle(connection, address):
+    # Manejo de entradas y salidas ademas de manejo sobre la conexion con el cliente
     import logging
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger("process-%r" % (address,))
@@ -29,12 +30,14 @@ class Server(object):
         self.port = port
 
     def start(self):
+        # Inicial servidor
         self.logger.debug("Escuchando")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.hostname, self.port))
         self.socket.listen(5)
 
         while True:
+            # Manejo de multiprocesos
             conn, address = self.socket.accept()
             self.logger.debug("Conexión hecha")
             process = multiprocessing.Process(target=handle, args=(conn, address))
