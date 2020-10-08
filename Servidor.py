@@ -1,44 +1,60 @@
+import multiprocessing
 import socket
-import sys
 
-class Servidor:
-    def __init__(self):
-        # Crear socket
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   
-    def iniciar_conexion(self):
-        # Enlazando el puerto del socket
-        server_address = ('localhost', 10000)
-        print('Iniciando conexion en {} puerto {}'.format(*server_address))
-        self.sock.bind(server_address)
+def handle(connection, address):
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger("process-%r" % (address,))
+    try:
+        logger.debug("Conectado %r puerto %r", connection, address)
+        while True:
+            data = connection.recv(1024)
+            if data == b"":
+                logger.debug("Socket cerrado remotamente")
+                break
+            logger.debug("Datos recividos %r", data)
+            connection.sendall(data)
+            logger.debug("Enviando datos")
+    except:
+        logger.exception("Problema metodo handle")
+    finally:
+        logger.debug("Cerrando socket")
+        connection.close()
 
-        # Escuchando las conexiones entrantes
-        self.sock.listen(1)
+class Server(object):
+    def __init__(self, hostname, port):
+        import logging
+        self.logger = logging.getLogger("Server")
+        self.hostname = hostname
+        self.port = port
+
+    def start(self):
+        self.logger.debug("Escuchando")
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((self.hostname, self.port))
+        self.socket.listen(1)
 
         while True:
-            # Esperar por la conexion
-            print('Esperando por la conexion')
-            connection, client_address = self.sock.accept()
-            
-            print('Conexion realizada desde', client_address)
+            conn, address = self.socket.accept()
+            self.logger.debug("Conexión hecha")
+            process = multiprocessing.Process(target=handle, args=(conn, address))
+            process.daemon = True
+            process.start()
+            self.logger.debug("Iniciando proceso %r", process)
 
-            #Recibo los datos en pequeños fragmentos y vuelvo a transmitirlos 
-            while True:
-                data = connection.recv(16)
-                print('recivido {!r}'.format(data))
-                if data:
-                    print('Enviando confirmacion al cliente')
-                    connection.sendall(data)
-                else:
-                    print('Datos no leidos desde', client_address)
-                    break
-    
-    def terminar_conexion(self):
-        # Cerrar conexion
-        print('Conexion terminada')
-        self.sock.close()
- 
 if __name__ == "__main__":
-    s = Servidor()
-    s.iniciar_conexion()
-    s.terminar_conexion()
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    server = Server("localhost", 10000)
+    try:
+        logging.info("Escuchando")
+        server.start()
+    except:
+        logging.exception("Excepcion inesperada")
+    finally:
+        logging.info("Parando proceso")
+        for process in multiprocessing.active_children():
+            logging.info("Parando proceso %r", process)
+            process.terminate()
+            process.join()
+    logging.info("Todo listo")

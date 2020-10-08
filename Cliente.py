@@ -1,26 +1,29 @@
+from logging import shutdown
 import socket
 import sys
 
-class Cliente:
-    def __init__(self, mensaje):
-        self._mensaje = mensaje
+class Cliente(object):
+    def __init__(self, data, hostname, port):
+        self.data = data
+        self.hostname = hostname
+        self.port = port 
+        
         # Crear socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    def iniciar_conexion(self):
+    def star(self):
         # Conectar socket con el servidor para que empiece a escuchar 
-        server_address = ('localhost', 10000)
+        server_address = (self.hostname, self.port)
         print('Iniciando conexion con {} puerto {}'.format(*server_address))
         self.sock.connect(server_address)
 
         # Enviar datos
-        print('Enviando {!r}'.format(self._mensaje))
-        self.sock.sendall(self._mensaje)
+        print('Enviando {!r}'.format(self.data))
+        self.sock.sendall(self.data)
 
         # Esperar respuesta
         amount_received = 0
-        amount_expected = len(self._mensaje)
-        
+        amount_expected = len(self.data)
         
 
         while amount_received < amount_expected:
@@ -28,15 +31,16 @@ class Cliente:
             amount_received += len(data)
             print('Recivido {!r}'.format(data))
     
-    def terminar_conexion(self):
+    def shutdown(self):
         # Cerrar conexion
         print('Conexion terminada')
         self.sock.close()
 
 
-mensaje = b'Hola mundo'
+
 
 if __name__ == "__main__":
-    c = Cliente(mensaje)
-    c.iniciar_conexion()
-    c.terminar_conexion()
+    data = input()
+    c = Cliente(data.encode(), hostname = 'localhost', port = 10000)
+    c.star()
+    c.shutdown()
