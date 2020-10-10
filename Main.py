@@ -1,3 +1,5 @@
+# Esto sirve pa culo todavia no tiene funcionalidad
+
 class Main:
     
     def __init__(self):
@@ -9,3 +11,5 @@ class Main:
 
 if __name__ == "__main__":
     Main.main()
+    
+    

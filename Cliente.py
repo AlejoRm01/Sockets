@@ -34,11 +34,35 @@ class Cliente(object):
         print('Conexion terminada')
         self.sock.close()
 
+def switcher_bucket(opcion):
+    pass
 
+def switcher_envio(opcion):
+    if opcion == '1':
+        return input()
+    if opcion == '2':
+        return
 
+def menu(): 
+    
+    print('Elige una opcion \n1) Opciones envio de datos \n2) Opciones buckets') 
+    aux = input()
+    if aux == '1':
+        print('1) Enviar texto plano \n2) Eliminar archivo')
+        aux_a = input()
+        return switcher_envio(aux_a)
+        
+    if aux == '2':
+        
+        print('1) Crear bucket \n2) Eliminar bucket \n3) Listar buckets \n4) Listar archivos de un bucket')
+        aux_a = input()
+        switcher_bucket(aux_a)
 
 if __name__ == "__main__":
-    data = input()
-    c = Cliente(data.encode(), hostname = 'localhost', port = 10000)
+    data = menu()
+    c = Cliente(data.encode('utf-8'), hostname = 'localhost', port = 10000)
     c.star()
     c.shutdown()
+    
+def bucket_ops(opcion):
+    pass
