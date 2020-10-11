@@ -9,20 +9,42 @@ class Cliente(object):
         self.port = port 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    def star(self):
-        # Conectar socket con el servidor para que empiece a escuchar 
+    def iniciar_con(self):
+        # Conectar cliente con el servidor
         server_address = (self.hostname, self.port)
         print('Iniciando conexion con {} puerto {}'.format(*server_address))
         self.sock.connect(server_address)
 
-        # Enviar datos
+        
+    def enviar_txt(self):
+        # Enviar entrada por consola 
         print('Enviando {!r}'.format(self.data))
-        self.sock.sendall(self.data)
+        self.sock.sendall(self.data.encode())
 
-        # Esperar respuesta
+
+    def enviar_data(self):
+        # Enviar un archivo de cualquier tipo
+        while True:
+            file = open(self.data, 'rb')
+            contenido = file.read(1024)
+            while contenido:
+                self.sock.send(contenido)
+                contenido = file.read(1024)   
+            break   
+        
+    def verificar_envio(self):
+        """
+        Verificacion y envio de datos
+        Se envia un 1 para confirmar el envio completo
+        Se espera confirmacion por parte del servidor
+        """
+        try:
+            self.sock.send(chr(1))
+        except TypeError:
+            self.sock.send(chr(1), 'utf-8')
+    
         amount_received = 0
         amount_expected = len(self.data)
-        
 
         while amount_received < amount_expected:
             data = self.sock.recv(16)
@@ -34,35 +56,9 @@ class Cliente(object):
         print('Conexion terminada')
         self.sock.close()
 
-def switcher_bucket(opcion):
-    pass
-
-def switcher_envio(opcion):
-    if opcion == '1':
-        return input()
-    if opcion == '2':
-        return
-
-def menu(): 
-    
-    print('Elige una opcion \n1) Opciones envio de datos \n2) Opciones buckets') 
-    aux = input()
-    if aux == '1':
-        print('1) Enviar texto plano \n2) Eliminar archivo')
-        aux_a = input()
-        return switcher_envio(aux_a)
-        
-    if aux == '2':
-        
-        print('1) Crear bucket \n2) Eliminar bucket \n3) Listar buckets \n4) Listar archivos de un bucket')
-        aux_a = input()
-        switcher_bucket(aux_a)
 
 if __name__ == "__main__":
-    data = menu()
-    c = Cliente(data.encode('utf-8'), hostname = 'localhost', port = 10000)
+    data = input()
+    c = Cliente(data, hostname = 'localhost', port = 10000)
     c.star()
     c.shutdown()
-    
-def bucket_ops(opcion):
-    pass
