@@ -46,7 +46,7 @@ class Cliente(object):
             amount_received += len(data)
             print('Recivido {!r}'.format(data))
     
-    def shutdown(self):
+    def cerrar_conexion(self):
         # Cerrar conexion
         print('Conexion terminada')
         self.sock.close()
@@ -58,4 +58,4 @@ if __name__ == "__main__":
     c.iniciar_con()
     c.enviar_txt()
     c.verificar_envio()
-    c.shutdown()
+    c.cerrar_conexion()
