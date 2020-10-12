@@ -52,6 +52,22 @@ class Cliente(object):
         self.sock.close()
 
 
+    def recibirTodo(sock):
+    datos = ""
+    buff_size = 4096
+     sock.getblocking()
+    
+    sock.setblocking(True)
+    try:
+        while True:
+            datos += sock.recv(buff_size)
+            
+            sock.setblocking(False)
+    except socket.error:
+        pass
+    
+    return datos
+
 if __name__ == "__main__":
     data = input()
     c = Cliente(data, hostname = 'localhost', port = 10000)
