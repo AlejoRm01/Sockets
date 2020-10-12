@@ -37,12 +37,7 @@ class Cliente(object):
         Verificacion y envio de datos
         Se envia un 1 para confirmar el envio completo
         Se espera confirmacion por parte del servidor
-        """
-        try:
-            self.sock.send(chr(1))
-        except TypeError:
-            self.sock.send(chr(1), 'utf-8')
-    
+        """   
         amount_received = 0
         amount_expected = len(self.data)
 
@@ -60,5 +55,7 @@ class Cliente(object):
 if __name__ == "__main__":
     data = input()
     c = Cliente(data, hostname = 'localhost', port = 10000)
-    c.star()
+    c.iniciar_con()
+    c.enviar_txt()
+    c.verificar_envio()
     c.shutdown()
