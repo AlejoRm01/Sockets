@@ -31,7 +31,13 @@ class Cliente(object):
                 self.sock.send(contenido)
                 contenido = file.read(1024)   
             break   
-        
+        try: 
+            self.sock(chr(1))
+        except TypeError:
+            self.sock.send(bytes(chr(1), 'utf-8'))
+        finally:
+            print('Se envio 1 como confirmacion de envio completo del archivo')
+                           
     def verificar_envio(self):
         """
         Verificacion y envio de datos
@@ -56,6 +62,6 @@ if __name__ == "__main__":
     data = input()
     c = Cliente(data, hostname = 'localhost', port = 10000)
     c.iniciar_con()
-    c.enviar_txt()
-    c.verificar_envio()
-    c.cerrar_conexion()
+    c.enviar_data()
+#    c.verificar_envio()
+#    c.cerrar_conexion()

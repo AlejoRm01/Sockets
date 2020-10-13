@@ -1,3 +1,4 @@
+# Esto sirve pa culo
 class Diccionario:
     def __init__(self, items):
         self._items = items 

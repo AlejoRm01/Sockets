@@ -1,57 +1,59 @@
 import multiprocessing
+from multiprocessing import connection
 import socket
-
-def handle(connection, address):
-    # Manejo de entradas y salidas ademas de manejo sobre la conexion con el cliente
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    logger = logging.getLogger("process-%r" % (address,))
-    try:
-        logger.debug("Conectado %r puerto %r", connection, address)
-        while True:
-            data = connection.recv(1024)
-            if data == b"":
-                logger.debug("Socket cerrado remotamente")
-                break
-            logger.debug("Datos recividos %r", data)
-            connection.sendall(data)
-            logger.debug("Enviando datos")
-    except:
-        logger.exception("Problema metodo handle")
-    finally:
-        logger.debug("Cerrando socket")
-        connection.close()
-
+   
 class Server(object):
     def __init__(self, hostname, port):
-        import logging
-        self.logger = logging.getLogger("Server")
         self.hostname = hostname
         self.port = port
 
-    def start(self):
-        # Inicial servidor
-        self.logger.debug("Escuchando")
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((self.hostname, self.port))
-        self.socket.listen(5)
+    def iniciar_con(self):
+            # Inicial servidor
+            print("Escuchando")
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.bind((self.hostname, self.port))
+            self.socket.listen(5)
+            while True:
+                # Manejo de multiprocesos
+                host, port = self.socket.accept()
+                print("Conexión hecha")
+                process = multiprocessing.Process(target= self.esperar_recivir_con, args=(host, port))
+                process.daemon = True
+                process.start()
+                print("Iniciando proceso %r", process)
 
+    def esperar_recivir_con(self, host, port):
+        # Manejo de entradas y salidas ademas de manejo sobre la conexion con el cliente
+        file = open("recibido.png", "wb")
+        print("process-%r" % (port,))
+        print("Conectado %r puerto %r", host, port)
         while True:
-            # Manejo de multiprocesos
-            conn, address = self.socket.accept()
-            self.logger.debug("Conexión hecha")
-            process = multiprocessing.Process(target=handle, args=(conn, address))
-            process.daemon = True
-            process.start()
-            self.logger.debug("Iniciando proceso %r", process)
-
+            data = host.recv(1024)
+            if data == b"":
+                print("Socket cerrado remotamente")
+                break
+            else:
+                if data:
+                    if isinstance(data, bytes):
+                        respuesta = data[0] == 1
+                    else:
+                        respuesta = data == chr(1)
+                    if not respuesta:
+                        file.write(data)
+                        print("Datos recividos %r", data)
+                        
+                            
+            file.close()                   
+            host.close()
+            
+    
 if __name__ == "__main__":
     import logging
     logging.basicConfig(level=logging.DEBUG)
     server = Server("localhost", 10000)
     try:
         logging.info("Escuchando")
-        server.start()
+        server.iniciar_con()
     except:
         logging.exception("Excepcion inesperada")
     finally:
