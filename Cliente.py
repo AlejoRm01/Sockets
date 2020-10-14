@@ -1,66 +1,51 @@
-from logging import shutdown
 import socket
 import sys
 
 class Cliente(object):
-    def __init__(self, data, hostname, port):
-        self.data = data
+    
+    def __init__(self, hostname, port, data):
+        self.nombre_data = data
         self.hostname = hostname
         self.port = port 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    def iniciar_con(self):
-        # Conectar cliente con el servidor
-        server_address = (self.hostname, self.port)
-        print('Iniciando conexion con {} puerto {}'.format(*server_address))
-        self.sock.connect(server_address)
-
+        self.data = data
         
-    def enviar_txt(self):
-        # Enviar entrada por consola 
-        print('Enviando {!r}'.format(self.data))
-        self.sock.sendall(self.data.encode())
-
-
-    def enviar_datos(self):
-        # Enviar un archivo de cualquier tipo
-        while True:
-            file = open(self.data, 'rb')
-            contenido = file.read(1024)
-            while contenido:
-                self.sock.send(contenido)
-                contenido = file.read(1024)   
-            break   
-        try: 
-            self.sock(chr(1))
-        except TypeError:
-            self.sock.send(bytes(chr(1), 'utf-8'))
-        finally:
-            print('Se envio 1 como confirmacion de envio completo del archivo')
-                           
-    def verificar_envio(self):
-        """
-        Verificacion y envio de datos
-        Se recive un 1 para confirmar el envio completo
-        Se espera 0 para confirmar un error por parte del servidor
-        """   
-        cantidad_recivida = 0
-        cantidad_esperada = 1
-        while cantidad_recivida < cantidad_esperada:
-            data = self.sock.recv(16)
-            cantidad_esperada += len(data)
-            print('Recivido {!r}'.format(data))
+    def iniciar_con(self):
+        # Iniciar servicio
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.hostname, self.port))
     
-    def cerrar_conexion(self):
-        # Cerrar conexion
-        print('Conexion terminada')
+    def enviar_txt(self):
+        self.sock.send(self.nombre_data)
+    
+    def enviar_archivo(self):
+        while True:
+            file = open(self.data, "rb")
+            self.data = file.read(1024)
+            
+            while self.data:
+                # Enviar contenido.
+                self.sock.send(self.data)
+                self.data = file.read(1024)
+            break 
+        # Se utiliza el caracter de código 1 para indicar
+        # al cliente que ya se ha enviado todo el contenido.
+        try:
+            self.sock.send(chr(1))
+        except TypeError:
+            # Compatibilidad con Python 3.
+            self.sock.send(bytes(chr(1), "utf-8"))
+        
+        # Cerrar archivo.
+        file.close()
+        print("El archivo ha sido enviado correctamente.")
+    
+    def cerrar_con(self):
+        # Cerrar conexión 
         self.sock.close()
 
 
 if __name__ == "__main__":
-    data = 'Prueba.png'
-    c = Cliente(data, hostname = 'localhost', port = 10000)
+    c = Cliente(hostname = 'localhost', port = 6030, data = 'Prueba.png')
     c.iniciar_con()
-    c.enviar_datos()
-    c.verificar_envio()
-    c.cerrar_conexion()
+    c.enviar_archivo()
+    c.cerrar_con()
