@@ -1,4 +1,4 @@
-from multiprocessing import process
+from Buffer import Buffer
 from socket import error
 import socket, multiprocessing
    
@@ -20,6 +20,7 @@ class Server():
         # Aceptar solicitudes 
         while True:
             self.conn, self.addr = self.sock.accept()
+            self.buff = Buffer.Buffer(self.conn)
             print('contectado con %r ', self.conn)
             # Manejo de procesos mediante el uso de un while y el manejo de un metodo
             proceso = multiprocessing.Process(target= self.leer_archivo, args=())
@@ -28,26 +29,26 @@ class Server():
             print('Nuevo proceso inciado %r', proceso)
             
     def leer_archivo(self):
-          
+        # Crear archivo  
         file = open("recibido.png", "wb")
         
         while True:
             try:
                 # Recibir datos del cliente.
-                input_data = self.conn.recv(1024)
+                archivo =self.conn.recv(1024)
             except error:
                 print("Error de lectura.")
                 break
             else:
-                if input_data:
+                if archivo:
                     # Compatibilidad con Python 3.
-                    if isinstance(input_data, bytes):
-                        end = input_data[0] == 1
+                    if isinstance(archivo, bytes):
+                        end = archivo[0] == 1
                     else:
-                        end = input_data == chr(1)
+                        end = archivo == chr(1)
                     if not end:
                         # Almacenar datos.
-                        file.write(input_data)
+                        file.write(archivo)
                     else:
                         break
         
