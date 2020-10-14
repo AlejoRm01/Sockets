@@ -8,58 +8,51 @@ class Server(object):
         self.port = port
 
     def iniciar_con(self):
-            # Inicial servidor
-            print("Escuchando")
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.bind((self.hostname, self.port))
-            self.socket.listen(5)
-            while True:
-                # Manejo de multiprocesos
-                host, port = self.socket.accept()
-                print("Conexión hecha")
-                process = multiprocessing.Process(target= self.esperar_recivir_con, args=(host, port))
-                process.daemon = True
-                process.start()
-                print("Iniciando proceso %r", process)
-
-    def esperar_recivir_con(self, host, port):
-        # Manejo de entradas y salidas ademas de manejo sobre la conexion con el cliente
-        file = open("recibido.png", "wb")
-        print("process-%r" % (port,))
-        print("Conectado %r puerto %r", host, port)
+        # Inicial servidor
+        print("Escuchando")
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+              
+    def lectura_datos(self):
+        # Escuchar peticiones en el puerto 10000.
+        self.sock.bind((self.hostname, self.port))
+        self.sock.listen(0)
+        
+        file = open("recibido.jpg", "wb")
+        conn, addr = self.sock.accept()
+        print('Conectado con {!r}'.format(conn, addr))
         while True:
-            data = host.recv(1024)
-            if data == b"":
-                print("Socket cerrado remotamente")
+            
+            try:
+                # Recibir datos del cliente.
+                archivo_recivido = conn.recv(1024)
+            except TypeError:
+                print("Error de lectura.")
                 break
             else:
-                if data:
-                    if isinstance(data, bytes):
-                        respuesta = data[0] == 1
+                if archivo_recivido:
+                    # Enviar confirmacion del archivo
+                    if isinstance(archivo_recivido, bytes):
+                        aux = archivo_recivido[0] == 1
                     else:
-                        respuesta = data == chr(1)
-                    if not respuesta:
-                        file.write(data)
-                        print("Datos recividos %r", data)
-                        
-                            
-            file.close()                   
-            host.close()
+                        aux = archivo_recivido == chr(1)
+                    if not aux:
+                        # Almacenar datos. 
+                        file.write(archivo_recivido)
+                    else:
+                        conn.send(b'0')
+                        break
+            break
+        conn.sendall(b'1')            
+        print("El archivo se ha recibido correctamente.")
+        file.close()
             
-    
+    def cerrar_conexion(self):
+        # Cerrar conexion
+        print('Conexion terminada')
+        self.sock.close()
+
 if __name__ == "__main__":
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    server = Server("localhost", 10000)
-    try:
-        logging.info("Escuchando")
-        server.iniciar_con()
-    except:
-        logging.exception("Excepcion inesperada")
-    finally:
-        logging.info("Parando proceso")
-        for process in multiprocessing.active_children():
-            logging.info("Parando proceso %r", process)
-            process.terminate()
-            process.join()
-    logging.info("Todo listo")
+    s = Server("localhost", 10000)
+    s.iniciar_con()
+    s.lectura_datos()
+    s.cerrar_conexion()

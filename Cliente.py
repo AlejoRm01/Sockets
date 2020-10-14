@@ -22,7 +22,7 @@ class Cliente(object):
         self.sock.sendall(self.data.encode())
 
 
-    def enviar_data(self):
+    def enviar_datos(self):
         # Enviar un archivo de cualquier tipo
         while True:
             file = open(self.data, 'rb')
@@ -41,15 +41,14 @@ class Cliente(object):
     def verificar_envio(self):
         """
         Verificacion y envio de datos
-        Se envia un 1 para confirmar el envio completo
-        Se espera confirmacion por parte del servidor
+        Se recive un 1 para confirmar el envio completo
+        Se espera 0 para confirmar un error por parte del servidor
         """   
-        amount_received = 0
-        amount_expected = len(self.data)
-
-        while amount_received < amount_expected:
+        cantidad_recivida = 0
+        cantidad_esperada = 1
+        while cantidad_recivida < cantidad_esperada:
             data = self.sock.recv(16)
-            amount_received += len(data)
+            cantidad_esperada += len(data)
             print('Recivido {!r}'.format(data))
     
     def cerrar_conexion(self):
@@ -59,9 +58,9 @@ class Cliente(object):
 
 
 if __name__ == "__main__":
-    data = input()
+    data = 'Prueba.png'
     c = Cliente(data, hostname = 'localhost', port = 10000)
     c.iniciar_con()
-    c.enviar_data()
-#    c.verificar_envio()
-#    c.cerrar_conexion()
+    c.enviar_datos()
+    c.verificar_envio()
+    c.cerrar_conexion()
