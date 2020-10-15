@@ -19,7 +19,6 @@ class Server():
         # Aceptar solicitudes 
         while True:
             self.conn, self.addr = self.sock.accept()
-            self.buff = Buffer.Buffer(self.conn)
             print('contectado con %r ', self.conn)
             # Manejo de procesos mediante el uso de un while y el manejo de un metodo
             proceso = multiprocessing.Process(target= self.leer_archivo, args=())
