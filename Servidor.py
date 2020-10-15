@@ -1,12 +1,12 @@
 from socket import error
-import socket, multiprocessing
+import pickle
+import socket, multiprocessing, struct
    
 class Server():
     
     def __init__(self, hostname, port):
         self.hostname = hostname
         self.port = port
-        
     
     def iniciar_con(self):
         # Iniciar servicio 
@@ -21,36 +21,35 @@ class Server():
             self.conn, self.addr = self.sock.accept()
             print('contectado con %r ', self.conn)
             # Manejo de procesos mediante el uso de un while y el manejo de un metodo
-            proceso = multiprocessing.Process(target= self.leer_archivo, args=())
+            proceso = multiprocessing.Process(target= self.leer_dic, args=())
             proceso.daemon = True
             proceso.start()
             print('Nuevo proceso inciado %r', proceso)
             
-    def leer_archivo(self):
-        # Crear archivo  
-        file = open("recibido.png", "wb")
-        
-        while True:
-            try:
-                # Recibir datos del cliente.
-                archivo =self.conn.recv(1024)
-            except error:
-                print("Error de lectura.")
-                break
-            else:
-                if archivo:
-                    # Compatibilidad con Python 3.
-                    if isinstance(archivo, bytes):
-                        end = archivo[0] == 1
-                    else:
-                        end = archivo == chr(1)
-                    if not end:
-                        # Almacenar datos.
-                        file.write(archivo)
-                    else:
-                        break
-        
+    def leer_dic(self):
+        datos = ''     
+        # Recibir datos del cliente.
+        lengthbuf = self.recvall(self.conn, 4)
+        length, = struct.unpack('!I', lengthbuf)
+        datos = self.recvall(self.conn, length)
+            
+        self.org_datos(datos)
         print("El archivo se ha recibido correctamente.")
+    
+    def recvall (self, sock, count): 
+        buf = b'' 
+        while count: 
+            newbuf = sock.recv (count) 
+            if not  newbuf: return None 
+            buf += newbuf 
+            count -= len (newbuf) 
+        return buf
+    
+    def org_datos(self, x):
+        # Separar datos.
+        datos = pickle.loads(x)
+        file = open('recivido.png', 'wb')
+        file.write(datos['contenido'])        
         file.close()
         
     def cerrar_con(self):

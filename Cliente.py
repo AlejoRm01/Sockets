@@ -1,51 +1,51 @@
-import socket
-import sys
+import socket, pickle, struct
 
-class Cliente(object):
+class Cliente():
     
-    def __init__(self, hostname, port, data):
-        self.nombre_data = data
+    def __init__(self, hostname, port, dicc):
         self.hostname = hostname
         self.port = port 
-        self.data = data
+        self.dicc = dicc
         
     def iniciar_con(self):
         # Iniciar servicio
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.hostname, self.port))
     
-    def enviar_txt(self):
-        self.sock.send(self.nombre_data)
-    
     def enviar_archivo(self):
-        while True:
-            file = open(self.data, "rb")
-            self.data = file.read(1024)
-            
-            while self.data:
-                # Enviar contenido.
-                self.sock.send(self.data)
-                self.data = file.read(1024)
-            break 
-        # Se utiliza el caracter de código 1 para indicar
-        # al cliente que ya se ha enviado todo el contenido.
-        try:
-            self.sock.send(chr(1))
-        except TypeError:
-            # Compatibilidad con Python 3.
-            self.sock.send(bytes(chr(1), "utf-8"))
-        
-        # Cerrar archivo.
-        file.close()
-        print("El archivo ha sido enviado correctamente.")
+        # Enviar informacion de los datos
+        length = len(self.dicc)
+        self.sock.sendall(struct.pack('!I', length))
+        self.sock.sendall(self.dicc)
+        print('El archivo ha sido enviado correctamente.')
     
     def cerrar_con(self):
         # Cerrar conexión 
         self.sock.close()
 
+# Gestion cliente
+
+def organizar_dicc():  
+    # Organizar el dicc 
+    print('Ingrese nombre del archivo con su extencion')
+    nombre_archivo = 'Prueba.png'
+    print('Ingrese el paht del archivo')
+    path_archivo = 'Prueba.png'
+    file = open(path_archivo, 'rb') 
+    contenido = file.read()
+    # Encapsular los datos para enviar solo 1 trama con estos
+    dicc = {'nombre_archivo': nombre_archivo,
+                    'contenido': contenido}
+    dicc_listo = pickle.dumps(dicc)
+
+    file.close()
+    return dicc_listo
+    
+        
 
 if __name__ == "__main__":
-    c = Cliente(hostname = 'localhost', port = 6030, data = 'Prueba.png')
+    dicc = organizar_dicc()
+    c = Cliente(hostname = 'localhost', port = 6030, dicc = dicc)
     c.iniciar_con()
     c.enviar_archivo()
     c.cerrar_con()
