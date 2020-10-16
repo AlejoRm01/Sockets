@@ -69,7 +69,7 @@ class gestion_servidor:
         self.dicc[id_bucket] = b
     
     def get_bucket(self, id_bucket):
-        return self.dicc[id_bucket].__dict__
+        return self.dicc[id_bucket]
     
     def getAll_bucket(self):
         return self.dicc
@@ -98,23 +98,29 @@ if __name__ == "__main__":
     g.add_contenido(1, 3, 'Hola ', 'No me maten')
     g.add_contenido(2, 1, 'Mi mamá me ama ','Soy el putas')
     g.add_contenido(2, 2, 'Hola mundo HP', 'AHORQUENME')
-    g.add_contenido(2, 3, 'Adios', 'Alfredo es gay')
-    print('1')
-    print(g.get_bucket(1))
-    print('2')
-    x = g.getAll_bucket()
-    for y in x:
-        for z in y:
-            print(x[y][z].__dict__)
-            
+    g.add_contenido(2, 3, 'Adios', 'Alfredo es gay')   
+    contenedor = g.getAll_bucket()
+    # Listar informacion de todos los buckets
+    for x in contenedor:
+        print('Contenido del bucket: %r', x)
+        aux = contenedor[x].__dict__
+        for y in aux['dicc']:
+            print(aux['dicc'][y].__dict__)      
     print('3')
     g.del_bucket(1)
     g.del_contenido(2,1)
     print(g.get_bucket(2))
+    # Listar contenido de un bucket en especifico    
+    print('1')
+    contenedor = g.get_bucket(1).__dict__
+    print('Informacion de contenedor: %r', contenedor['id_bucket'])
+    for x in contenedor['dicc']:
+        print(contenedor['dicc'][x].__dict__)
+         
         
-        
-        
-    '''    
+       
+    ''' 
+    # Probar conexion entre cliente y socket  
     s = Server( hostname = 'localhost', port = 6030)
     s.iniciar_con()
     s.aceptar_con()

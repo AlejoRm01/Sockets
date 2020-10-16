@@ -12,7 +12,7 @@ class Bucket():
         self.dicc[id_contenido] = c 
            
     def get_contenido(self, id_contenido):
-        return self.dicc[id_contenido].__dict__
+        return self.dicc[id_contenido]
     
     def getAll_contenido(self):
         return self.dicc
