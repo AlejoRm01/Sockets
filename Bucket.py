@@ -1,5 +1,5 @@
 # Esto todavia sirve pa culo
-class Bucket(object):
+class Bucket():
     def __init__(self, id_bucket):
         self.id_bucket= id_bucket
         self.dicc = {}
@@ -25,7 +25,8 @@ class Contenido:
         self.id_contenido = id_contenido
         self.contenido = contenido
         self.nombre_contenido = nombre_contenido
-        
+
+  
 if __name__ == "__main__":
     
     b = Bucket(1)
@@ -33,8 +34,4 @@ if __name__ == "__main__":
     b.add_contenido(2, 'Hola mundo', 'Matenme')
     b.add_contenido(3, 'Hola ', 'No me maten')
     x =  b.getAll_contenido()
-    for y in x:
-        print(x[y].__dict__)
-    b.del_contenido(2)
-    for y in x:
-        print(x[y].__dict__)
+    print(x)

@@ -1,4 +1,4 @@
-import bucket
+from bucket import Bucket
 import pickle, socket, multiprocessing, struct
 
 from bucket import Contenido
@@ -65,7 +65,7 @@ class gestion_servidor:
         self.dicc = {}
         
     def add_bucket(self, id_bucket):
-        b = bucket(id_bucket)
+        b = Bucket(id_bucket)
         self.dicc[id_bucket] = b
     
     def get_bucket(self, id_bucket):
@@ -90,11 +90,30 @@ class gestion_servidor:
         self.dicc[id_bucket].del_contenido(id_contenido)
     
 if __name__ == "__main__":
-    pass
-
-
-
-
+    g = gestion_servidor()
+    g.add_bucket(1)
+    g.add_bucket(2)
+    g.add_contenido(1, 1, 'Mi mamá me mima.png','Soy el contenido')
+    g.add_contenido(1, 2, 'Hola mundo', 'Matenme')
+    g.add_contenido(1, 3, 'Hola ', 'No me maten')
+    g.add_contenido(2, 1, 'Mi mamá me ama ','Soy el putas')
+    g.add_contenido(2, 2, 'Hola mundo HP', 'AHORQUENME')
+    g.add_contenido(2, 3, 'Adios', 'Alfredo es gay')
+    print('1')
+    print(g.get_bucket(1))
+    print('2')
+    x = g.getAll_bucket()
+    for y in x:
+        for z in y:
+            print(x[y][z].__dict__)
+            
+    print('3')
+    g.del_bucket(1)
+    g.del_contenido(2,1)
+    print(g.get_bucket(2))
+        
+        
+        
     '''    
     s = Server( hostname = 'localhost', port = 6030)
     s.iniciar_con()
