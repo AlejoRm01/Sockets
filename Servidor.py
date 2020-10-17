@@ -90,6 +90,7 @@ class gestion_servidor:
         self.dicc[id_bucket].del_contenido(id_contenido)
     
 if __name__ == "__main__":
+    
     g = gestion_servidor()
     g.add_bucket(1)
     g.add_bucket(2)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     g.add_contenido(2, 2, 'Hola mundo HP', 'AHORQUENME')
     g.add_contenido(2, 3, 'Adios', 'Alfredo es gay')   
     contenedor = g.getAll_bucket()
-    # Listar informacion de todos los buckets
+    # Listar informacion todos los buckets y listar informacion que hay en cada uno 
     for x in contenedor:
         print('Contenido del bucket: %r', x)
         aux = contenedor[x].__dict__
