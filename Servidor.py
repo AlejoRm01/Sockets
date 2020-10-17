@@ -13,7 +13,7 @@ def handle(connection, address):
             if data == b"":
                 logger.debug("Socket cerrado remotamente")
                 break
-            logger.debug("Datos recividos %r", data)
+            logger.debug("Datos recibidos %r", data)
             connection.sendall(data)
             logger.debug("Enviando datos")
     except:
@@ -45,6 +45,23 @@ class Server(object):
             process.start()
             self.logger.debug("Iniciando proceso %r", process)
 
+
+    def recibir_todo(self):
+        datos = ""
+        buff_size = 4096
+        self.socket.sock.getblocking()
+        
+        self.socket.sock.setblocking(True)
+        try:
+            while True:
+                datos += self.sock.recv(buff_size)
+                print(datos)
+                self.socket.sock.setblocking(False)
+        except self.socket.error:
+            pass
+        
+
+    
 if __name__ == "__main__":
     import logging
     logging.basicConfig(level=logging.DEBUG)
@@ -52,6 +69,7 @@ if __name__ == "__main__":
     try:
         logging.info("Escuchando")
         server.start()
+        server.recibir_todo()
     except:
         logging.exception("Excepcion inesperada")
     finally:

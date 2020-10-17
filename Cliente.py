@@ -44,29 +44,14 @@ class Cliente(object):
         while amount_received < amount_expected:
             data = self.sock.recv(16)
             amount_received += len(data)
-            print('Recivido {!r}'.format(data))
+            print('Recibido {!r}'.format(data))
     
     def cerrar_conexion(self):
-        # Cerrar conexion
+        data = self.sock.recv(16)
+        print(format(data))
         print('Conexion terminada')
         self.sock.close()
 
-
-    def recibirTodo(sock):
-    datos = ""
-    buff_size = 4096
-     sock.getblocking()
-    
-    sock.setblocking(True)
-    try:
-        while True:
-            datos += sock.recv(buff_size)
-            
-            sock.setblocking(False)
-    except socket.error:
-        pass
-    
-    return datos
 
 if __name__ == "__main__":
     data = input()
