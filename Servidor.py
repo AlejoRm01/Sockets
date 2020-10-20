@@ -101,9 +101,10 @@ class gestion_servidor:
 
 
 if __name__ == "__main__":
+    
     g = gestion_servidor()
     contenedor = g.getAll_bucket()
-    # Listar informacion de todos los buckets
+    # Listar informacion todos los buckets y listar informacion que hay en cada uno 
     for x in contenedor:
         print('Contenido del bucket: %r', x)
         aux = contenedor[x].__dict__
