@@ -54,10 +54,12 @@ class Server():
         return buf
     
     def organizar_datos(self, x):
+        # swicth para llamara los metodos necesarios que envia el cliente
         datos = pickle.loads(x)
-        file = open('recibido.png', 'wb')
-        file.write(datos['Archivo'])        
-        file.close()
+        sw = {
+            
+        }
+        sw.get(datos, lambda: 'Argumento incorrecto ')
         
     def cerrar_con(self):
         # Cerrar conexión 
