@@ -1,62 +1,55 @@
-from logging import shutdown
-import socket
-import sys
+import socket, pickle, struct
 
-class Cliente(object):
-    def __init__(self, data, hostname, port):
-        self.data = data
+class Cliente():
+    
+    def __init__(self, hostname, port, dicc):
         self.hostname = hostname
         self.port = port 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
+        self.dicc = dicc
+        
     def iniciar_con(self):
-        # Conectar cliente con el servidor
-        server_address = (self.hostname, self.port)
-        print('Iniciando conexion con {} puerto {}'.format(*server_address))
-        self.sock.connect(server_address)
-
-        
-    def enviar_txt(self):
-        # Enviar entrada por consola 
-        print('Enviando {!r}'.format(self.data))
-        self.sock.sendall(self.data.encode())
-
-
-    def enviar_data(self):
-        # Enviar un archivo de cualquier tipo
-        while True:
-            file = open(self.data, 'rb')
-            contenido = file.read(1024)
-            while contenido:
-                self.sock.send(contenido)
-                contenido = file.read(1024)   
-            break   
-        
-    def verificar_envio(self):
-        """
-        Verificacion y envio de datos
-        Se envia un 1 para confirmar el envio completo
-        Se espera confirmacion por parte del servidor
-        """   
-        amount_received = 0
-        amount_expected = len(self.data)
-
-        while amount_received < amount_expected:
-            data = self.sock.recv(16)
-            amount_received += len(data)
-            print('Recibido {!r}'.format(data))
+        # Iniciar servicio
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.hostname, self.port))
     
-    def cerrar_conexion(self):
-        data = self.sock.recv(16)
-        print(format(data))
-        print('Conexion terminada')
+    def enviar_archivo(self):
+        # Enviar informacion de los datos
+        length = len(self.dicc)
+        self.sock.sendall(struct.pack('!I', length))
+        self.sock.sendall(self.dicc)
+        print('El archivo ha sido enviado correctamente.')
+    
+    def cerrar_con(self):
+        # Cerrar conexión 
         self.sock.close()
 
 
+# Gestion cliente
+
+def organizar_dicc():  
+    # Organizar el dicc 
+    print('Ingrese nombre del archivo con su extencion')
+    nombre_archivo = 'Prueba.png'
+    print('Ingrese el path del archivo')
+    path_archivo = 'Prueba.png'
+    file = open(path_archivo, 'rb') 
+    contenido = file.read()
+    # Encapsular los datos para enviar solo 1 trama con estos
+    dicc = {'nombre_archivo': nombre_archivo,
+                    'contenido': contenido}
+    dicc_listo = pickle.dumps(dicc)
+
+    file.close()
+    return dicc_listo
+    
+def inter_user():
+    print()
+    print()
+    print()       
+
 if __name__ == "__main__":
-    data = input()
-    c = Cliente(data, hostname = 'localhost', port = 10000)
+    dicc = organizar_dicc()
+    c = Cliente(hostname = 'localhost', port = 6030, dicc = dicc)
     c.iniciar_con()
-    c.enviar_txt()
-    c.verificar_envio()
-    c.cerrar_conexion()
+    c.enviar_archivo()
+    c.cerrar_con()

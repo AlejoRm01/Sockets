@@ -1,3 +1,5 @@
+
+from Servidor import Servidor,gestion_servidor
 # Esto sirve pa culo todavia no tiene funcionalidad
 
 class Main:
@@ -5,11 +7,13 @@ class Main:
     def __init__(self):
         pass
     
-    def main():
+    def main(self):
         print("Hello World!")
 
-
+    # def menu_opciones():
+    
 if __name__ == "__main__":
-    Main.main()
+    m = Main()
+    m.main()
     
     
