@@ -2,59 +2,72 @@ import socket, pickle, struct
 
 class Cliente():
     
-    def __init__(self, hostname, port, dicc):
+    def __init__(self, hostname, port):
         self.hostname = hostname
         self.port = port 
-        self.dicc = dicc
-        
-    def iniciar_con(self):
+        self.dicc = {}
+         
+    def iniciar_conexion(self):
         # Iniciar servicio
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.hostname, self.port))
+        
+    def leer_archivo(self, path):
+        file = open(path, 'rb')
+        self.dicc['Archivo'] = file.read()
+        file.read()
+        file.close()
     
     def enviar_archivo(self):
-        # Enviar informacion de los datos
-        length = len(self.dicc)
+        # Enviar datos al servidor
+        x = pickle.dumps(self.dicc)
+        length = len(x)
         self.sock.sendall(struct.pack('!I', length))
-        self.sock.sendall(self.dicc)
-        print('El archivo ha sido enviado correctamente.')
+        self.sock.sendall(x)
+        respuesta = self.sock.recv(16)
+        print(respuesta)
     
-    def cerrar_con(self):
-        # Cerrar conexión 
-        self.sock.close()
+    def recibir_archivo(self):   
+        # Recibir datos del servidor.
+        lengthbuf = self.recvall(4)
+        length, = struct.unpack('!I', lengthbuf)
+        datos = self.recvall(length)    
+        print(datos)
+    
+    def recvall (self, count): 
+        buf = b'' 
+        while count: 
+            newbuf = self.sock.recv (count) 
+            if not  newbuf: return None 
+            buf += newbuf 
+            count -= len (newbuf) 
+        return buf
 
+    
+    def cerrar_conexion(self):
+        self.sock.close()
+                
     def inter_user(self):
         variable = 1;
         while(int(variable) < 5):
             print('Bienvenido a la central de control servidor-socket. En que le podemos ayudar hoy?''\n'+ '1)Enviar un archivo''\n' +'2)Recibir un archivo''\n' +'3)Ver lista de todos los archivos''\n' +'4)Eliminar un bucket''\n5)Cerrar conexion')
             variable= input()
-            self.sock.send(bytes(variable,'utf-8'))
-        if(int(variable) == 5):
-            print('Cerrando conexion')
-
-# Gestion cliente
-
-def organizar_dicc():  
-    # Organizar el dicc 
-    print('Ingrese nombre del archivo con su extencion')
-    nombre_archivo = 'Prueba.png'
-    print('Ingrese el path del archivo')
-    path_archivo = 'Prueba.png'
-    file = open(path_archivo, 'rb') 
-    contenido = file.read()
-    # Encapsular los datos para enviar solo 1 trama con estos
-    dicc = {'nombre_archivo': nombre_archivo,
-                    'contenido': contenido}
-    dicc_listo = pickle.dumps(dicc)
-
-    file.close()
-    return dicc_listo
-    
-
+            if(variable == '1'):
+                path = input('Ingrese el path del archivo a enviar')
+                self.leer_archivo(path)
+                self.enviar_archivo()
+            if(variable == '2'):
+                print('Aca se recibe un archivo')
+            if(variable == '3'):
+                print('Aca se listan todos los archivos')
+            if(variable == '4'):
+                print('Aca se eliminan todos los archivos')
+            
+            if(int(variable) == 5):
+                self.cerrar_conexion()
 
 
 if __name__ == "__main__":
-    dicc = organizar_dicc()
-    c = Cliente(hostname = 'localhost', port = 6030, dicc = dicc)
-    c.iniciar_con()
-    c.inter_user();
+    c = Cliente(hostname = 'localhost', port = 6030)
+    c.iniciar_conexion()
+    c.inter_user()
