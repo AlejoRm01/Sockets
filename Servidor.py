@@ -42,6 +42,17 @@ class Server():
         self.org_datos(datos)
         print("El archivo se ha recibido correctamente.")
 
+    #INTERFAZ DE SERVIDOR (Envia respuesta al usuario segun el comando)
+    def inter_server(self):
+        print('aqui se envian datos')
+        # self.sock.listen(1)
+        buf= ''
+        while len(buf)<4:
+            buf += self.recvall(self.sock,8)
+        num = struct.unpack('!i', buf[:4])[0]
+        print('Se recibio el siguiente comando {num}')
+
+
     def recvall(self, sock, count):
         buf = b''
         while count:
@@ -66,6 +77,7 @@ class Server():
         self.sock.close()
 
 # Gestion de servidor
+    
 
 
 class gestion_servidor:
@@ -102,36 +114,38 @@ class gestion_servidor:
 
 if __name__ == "__main__":
     
-    g = gestion_servidor()
-    contenedor = g.getAll_bucket()
-    # Listar informacion todos los buckets y listar informacion que hay en cada uno 
-    for x in contenedor:
-        print('Contenido del bucket: %r', x)
-        aux = contenedor[x].__dict__
-        for y in aux['dicc']:
+    # g = gestion_servidor()
+    # contenedor = g.getAll_bucket()
+    # # Listar informacion todos los buckets y listar informacion que hay en cada uno 
+    # for x in contenedor:
+    #     print('Contenido del bucket: %r', x)
+    #     aux = contenedor[x].__dict__
+    #     for y in aux['dicc']:
 
-            print(aux['dicc'][y].__dict__)
-    print('3')
+    #         print(aux['dicc'][y].__dict__)
+    # print('3')
 
-    # eliminar
+    # # eliminar
 
-    # Listar contenido de un bucket en especifico
-    print('1')
-    contenedor = g.get_bucket(1).__dict__
-    print('Informacion de contenedor: %r', contenedor['id_bucket'])
-    aux = contenedor['dicc'][1].__dict__
-    # y = bytes(aux['contenido'], 'utf-8')
-    y = open('f.pdf', 'rb')
-    f = y.read()
-    open('C:/Users/DELL/Desktop/pruebasPrograma/imagensitaperrona123.pdf',
-         'wb').write(bytearray(f))
+    # # Listar contenido de un bucket en especifico
+    # print('1')
+    # contenedor = g.get_bucket(1).__dict__
+    # print('Informacion de contenedor: %r', contenedor['id_bucket'])
+    # aux = contenedor['dicc'][1].__dict__
+    # # y = bytes(aux['contenido'], 'utf-8')
+    # y = open('f.pdf', 'rb')
+    # f = y.read()
+    # open('C:/Users/DELL/Desktop/pruebasPrograma/imagensitaperrona123.pdf',
+    #      'wb').write(bytearray(f))
 
 # metodo
     s = Server( hostname = 'localhost', port = 6030)
     s.iniciar_con()
     s.aceptar_con()
+
     for proceso in multiprocessing.active_children():
         print('Terminando proceso %r', proceso)
         proceso.terminate()
         proceso.join()
     print('Listo')    
+    s.inter_server()

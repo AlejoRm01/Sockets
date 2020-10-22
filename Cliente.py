@@ -23,6 +23,14 @@ class Cliente():
         # Cerrar conexión 
         self.sock.close()
 
+    def inter_user(self):
+        variable = 1;
+        while(int(variable) < 5):
+            print('Bienvenido a la central de control servidor-socket. En que le podemos ayudar hoy?''\n'+ '1)Enviar un archivo''\n' +'2)Recibir un archivo''\n' +'3)Ver lista de todos los archivos''\n' +'4)Eliminar un bucket''\n5)Cerrar conexion')
+            variable= input()
+            self.sock.send(bytes(variable,'utf-8'))
+        if(int(variable) == 5):
+            print('Cerrando conexion')
 
 # Gestion cliente
 
@@ -42,14 +50,11 @@ def organizar_dicc():
     file.close()
     return dicc_listo
     
-def inter_user():
-    print()
-    print()
-    print()       
+
+
 
 if __name__ == "__main__":
     dicc = organizar_dicc()
     c = Cliente(hostname = 'localhost', port = 6030, dicc = dicc)
     c.iniciar_con()
-    c.enviar_archivo()
-    c.cerrar_con()
+    c.inter_user();
