@@ -10,13 +10,16 @@ class Server():
         
     def iniciar_conexion(self):
         # Iniciar servicio 
-        print('Escuchando')
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind((self.hostname, self.port))
-        if(os.path.isdir('Buckets') == False):
-            os.mkdir('Buckets')
-        self.sock.listen(1)
-    
+        try:
+            print('Escuchando')
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.bind((self.hostname, self.port))
+            if(os.path.isdir('Buckets') == False):
+                os.mkdir('Buckets')
+            self.sock.listen(1)
+        except Exception as e:
+            print(e)
+            
     def aceptar_conexion(self):
         # Aceptar solicitudes 
         while True:
@@ -28,9 +31,6 @@ class Server():
             proceso.start()
             print('Nuevo proceso inciado %r', proceso)
     
-
-
-
     def crear_bucket(self,datos):
         
         if(os.path.isdir('Buckets/' + datos['bucket']) == False):
@@ -147,12 +147,6 @@ class Server():
         if(datos['comando'] == '8'):
             print("Se esta cerrando el servidor.")
             self.connected = False
-       
-       
-        # sw = { 
-            
-        # }
-        # sw.get(datos, lambda: 'Argumento incorrecto ')
         
     def cerrar_con(self):
         # Cerrar conexión

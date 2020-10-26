@@ -9,12 +9,14 @@ class Cliente():
      
     def iniciar_conexion(self):
         # Iniciar servicio
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.hostname, self.port))
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.connect((self.hostname, self.port))
+        except Exception as e:
+            print(e)
     
     def leer_comando(self):
         x = input('ingrese comando')
-
         self.dicc[1] = x
     
     def leer_archivo(self, path):
@@ -31,13 +33,9 @@ class Cliente():
         length = len(x)
         self.sock.sendall(struct.pack('!I', length))
         self.sock.sendall(x)
-        
         # print(self.recvall(1024))
-        
         # print(respuesta)
-    
-
-    
+       
     def recvall (self):
         msg = self.sock.recv(17520)
         msgg = pickle.loads(msg)
@@ -47,8 +45,6 @@ class Cliente():
             f.write(msgg['archivo'])
             f.close()
 
-
-
     def recvallfile(self):
         
         msg = self.sock.recv(17520)
@@ -56,8 +52,7 @@ class Cliente():
         print(colorama.Back.BLUE+colorama.Fore.RED+ msgg['mensaje']+colorama.Style.RESET_ALL)
         if(msgg['mensaje'] != (f"No existe el bucket {self.dicc['bucket']}")):
             for fichero in msgg['lista']:
-                print(fichero)
-        
+                print(fichero)    
 
     def cerrar_conexion(self):
         self.sock.close()
