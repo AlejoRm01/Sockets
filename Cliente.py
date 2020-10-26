@@ -26,7 +26,7 @@ class Cliente():
     
     def enviar_archivo(self):
         # Enviar datos al servidor
-        print("pasa por aca ")
+        # print("pasa por aca ")
         x = pickle.dumps(self.dicc)
         length = len(x)
         self.sock.sendall(struct.pack('!I', length))
@@ -42,7 +42,13 @@ class Cliente():
         msg = self.sock.recv(17520)
         msgg = pickle.loads(msg)
         print(colorama.Back.BLUE+colorama.Fore.RED+ msgg['mensaje']+colorama.Style.RESET_ALL)
-    
+        if(msgg['archivo'] != "no"):
+            f = open(msgg['nombreArchivo'],'wb')
+            f.write(msgg['archivo'])
+            f.close()
+
+
+
     def recvallfile(self):
         
         msg = self.sock.recv(17520)
@@ -60,7 +66,7 @@ class Cliente():
         variable = 1;
         colorama.init()
         while(int(variable) < 7):
-            print('Bienvenido a la central de control servidor-socket. En que le podemos ayudar hoy?''\n'+ '1)Crear bucket''\n' +'2)Eliminar un bucket''\n' +'3)Ver lista de todos los buckets''\n' +'4)Subir un archivo a un bucket''\n5)Eliminar un archivo de un bucket \n 6)Listar archivos de un bucket\n 7) Acabar con la conexion')
+            print('Bienvenido a la central de control servidor-socket. En que le podemos ayudar hoy?''\n'+ '1)Crear bucket''\n' +'2)Eliminar un bucket''\n' +'3)Ver lista de todos los buckets''\n' +'4)Subir un archivo a un bucket''\n5)Eliminar un archivo de un bucket \n6)Listar archivos de un bucket\n7) Descargar un archivo\n8) Acabar con la conexion')
             variable= input()
             if(variable == '1'):
                 self.dicc['comando'] = '1'
@@ -100,6 +106,13 @@ class Cliente():
                 self.recvallfile()
             if(variable == '7'):
                 self.dicc['comando'] = '7'
+                self.dicc['bucket'] = input('Ingrese el nombre del bucket donde quiere descargar el archivo \n')
+                self.dicc['nombreArchivo'] = input('Ingrese el nombre del archivo que quiere descargar\n')
+                self.enviar_archivo()
+                self.recvall()
+
+            if(variable == '8'):
+                self.dicc['comando'] = '8'
                 self.enviar_archivo()
                 self.cerrar_conexion()
 
