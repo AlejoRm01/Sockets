@@ -154,7 +154,7 @@ class Server():
     
 if __name__ == "__main__":
  # Probar conexion entre cliente y socket  
-    s = Server( hostname = 'localhost', port = 5050)
+    s = Server( hostname = '', port = 5050)
     s.iniciar_conexion()
     s.aceptar_conexion()
     for proceso in multiprocessing.active_children():

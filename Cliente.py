@@ -112,7 +112,7 @@ class Cliente():
                 self.cerrar_conexion()
 
 if __name__ == "__main__":
-    c = Cliente(hostname = 'localhost', port = 5050)
+    c = Cliente(hostname = '', port = 5050)
     c.iniciar_conexion()
     c.inter_user()
     c.cerrar_conexion()
